@@ -29,48 +29,43 @@ import jakarta.validation.Valid;
 public class TemaController {
 	@Autowired
 	private TemaRepository temaRepository;
-	
+
 	@GetMapping
-	public ResponseEntity<List<Tema>> getAll(){
+	public ResponseEntity<List<Tema>> getAll() {
 		return ResponseEntity.ok(temaRepository.findAll());
 	}
-	
+
 	@GetMapping("/{id}")
-	public ResponseEntity<Tema> getById(@PathVariable Long id){
-		return temaRepository.findById(id)
-				.map(resp -> ResponseEntity.ok(resp))
+	public ResponseEntity<Tema> getById(@PathVariable Long id) {
+		return temaRepository.findById(id).map(resp -> ResponseEntity.ok(resp))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-//	@GetMapping("titulo/{titulo}")
-//	public ResponseEntity<List<Tema>> getByTitulo(@PathVariable String titulo) {
-//		return ResponseEntity.ok(temaRepository.findAllByTituloContainingIgnoreCase(titulo));
-//	}
-	
-	
+	@GetMapping("descricao/{descricao}")
+	public ResponseEntity<List<Tema>> getByDescricao(@PathVariable String descricao) {
+		return ResponseEntity.ok(temaRepository.findAllByDescricaoContainingIgnoreCase(descricao));
+	}
+
 	@PostMapping
 	public ResponseEntity<Tema> post(@Valid @RequestBody Tema tema) {
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(temaRepository.save(tema));
+		return ResponseEntity.status(HttpStatus.CREATED).body(temaRepository.save(tema));
 	}
-	
+
 	@PutMapping
 	public ResponseEntity<Tema> put(@Valid @RequestBody Tema tema) {
 		return temaRepository.findById(tema.getId())
-			.map(resp -> ResponseEntity.status(HttpStatus.OK)
-			.body(temaRepository.save(tema)))
-			.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+				.map(resp -> ResponseEntity.status(HttpStatus.OK).body(temaRepository.save(tema)))
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
-	
-	
+
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) {
 		Optional<Tema> tema = temaRepository.findById(id);
-		
-		if(tema.isEmpty())
+
+		if (tema.isEmpty())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-		
-		temaRepository.deleteById(id);				
+
+		temaRepository.deleteById(id);
 	}
 }
